@@ -13,6 +13,7 @@ def addFolder():
         sources_gui_text.set(sources_gui_text.get() + f'\n{dir}')
         source_folders.append(dir)
 
+
 def setDestination():
     global dest
     dir = filedialog.askdirectory(parent=root)
@@ -30,19 +31,24 @@ def popupWindow():
 
 def do():
     for folder in source_folders:
-        print(f'Copying from {folder} to {dest}')
+        t = time.time()
+        target_folder = os.path.join(dest, os.path.basename(folder))
+        os.mkdir(target_folder)
+        print(f'Copying from {folder} to {target_folder}')
         s = subprocess.run(
-            ['robocopy', folder, dest, '/E', f'/MT:{os.cpu_count()}', '/NFL', '/NDL', '/NJH',
+            ['robocopy', folder, target_folder, '/E', f'/MT:{os.cpu_count()}', '/NFL', '/NDL', '/NJH',
              '/NJS'], capture_output=True)
         print(s)
+        print(f"Time taken: {time.time() - t}")
     print('everything is done')
-    time.sleep(100000)
+    print('https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/robocopy#exit-return-codes')
+    input()
+
 
 try:
-    ctypes.windll.shcore.SetProcessDpiAwareness(2) # if your windows version >= 8.1
+    ctypes.windll.shcore.SetProcessDpiAwareness(2)  # if your windows version >= 8.1
 except:
-    ctypes.windll.user32.SetProcessDPIAware() # win 8.0 or less
-
+    ctypes.windll.user32.SetProcessDPIAware()  # win 8.0 or less
 
 source_folders = []
 dest = ''
